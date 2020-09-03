@@ -1,0 +1,6 @@
+.venv
+.lsp_symlink
+docker
+mlruns
+.python_version
+

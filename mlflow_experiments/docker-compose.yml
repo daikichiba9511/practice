@@ -1,0 +1,81 @@
+version: "3"
+services:
+  # mlflow tracking server
+  mlflow:
+    image: mlflow
+    build:
+      context: .
+      dockerfile: Dockerfile.mlflow
+    ports:
+      - "5000:5000"
+    restart: always
+    depends_on:
+      - postgresql
+      - minio
+    environment:
+      MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+      AWS_ACCESS_KEY_ID: minio-access-key
+      AWS_SECRET_ACCESS_KEY: minio-secret-key
+    command: ./start_mlflow.sh
+    volumes:
+      - ./:/root/work/mlflow
+    links:
+      - "postgresql"
+      - "minio"
+
+
+    # strage for saving infomations which is not artifacts
+  postgresql:
+    build:
+        context: .
+        dockerfile: Dockerfile.postgres
+    restart: always
+    image: mlflow-postgres
+    container_name: mlflow-postgres
+    ports:
+      - "5433:5432"
+    environment:
+      # postgres user : admin
+      - POSTGRES_USER=mlflowuser
+      # data base name. if none,db which is the same name of user is made.
+      - POSTGRES_DB=mlflow_db
+      # postgres pass : admin
+      - POSTGRES_PASSWORD=mlflowpassword
+      # database host : localhost
+      # - DATABASE_HOST=loacalhost
+      # mount to sync folders
+    volumes:
+      - ./docker/db/:/var/lib/pgsql
+    
+
+  # storage for saving artifacts
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+    restart: always
+    volumes:
+      - minio1:/export
+    environment:
+      MINIO_ACCESS_KEY: minio-access-key
+      MINIO_SECRET_KEY: minio-secret-key
+    command: server /export
+
+
+  # when minio container start running, create automaticaly default packet
+  defaultbucket:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      until (/usr/bin/mc config host add myminio http://minio:9000 minio-access-key minio-secret-key) do echo 'try to create buckets...' && sleep 1; done;
+      /usr/bin/mc mb myminio/default;
+      /usr/bin/mc policy download myminio/default;
+      exit 0;
+      "
+
+volumes:
+  mlflow:
+  minio1:
+  postgres:

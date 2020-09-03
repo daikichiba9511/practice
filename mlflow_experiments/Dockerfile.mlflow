@@ -1,0 +1,20 @@
+# for server to manage experimets
+# base os : debian
+FROM python:3.8-slim
+
+# change working directory in container
+WORKDIR /root/work
+
+RUN apt update && apt upgrade -y \
+&&  apt install -y python3-pip python3 python-dev \
+&& apt install -y default-libmysqlclient-dev\
+# clean up image
+&& apt clean \
+& rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
+
+RUN pip3 install mlflow psycopg2-binary sqlalchemy boto3
+
+# /root/work/mlflow
+RUN mkdir -p ./mlflow
+WORKDIR /root/work/mlflow
+
