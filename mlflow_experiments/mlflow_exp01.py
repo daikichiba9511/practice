@@ -89,13 +89,15 @@ def main():
     np.savetxt(os.path.join(temp_dir.name, "y_train.csv"), data.y_train, delimiter=',')
     np.savetxt(os.path.join(temp_dir.name, "X_test.csv"), data.X_test, delimiter=',')
     np.savetxt(os.path.join(temp_dir.name, "y_test.csv"), data.y_test, delimiter=',')
-    mlflow.log_artifacts(temp_dir.name, artifact_path="dataset")
+
 
     # run start: runID is published here
     # runID is experiments number to specify each ones
     for C in {0.01, 1, 10, 100}:
         print(f"========= train starts with C = {C} ============")
         with mlflow.start_run(run_name="Search C", nested=True):
+
+            mlflow.log_artifacts(temp_dir.name, artifact_path="dataset")
 
             model = SVR(kernel="rbf", C=C, epsilon=0.1, gamma="auto").fit(data.X_train, data.y_train)
 
@@ -121,3 +123,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    
