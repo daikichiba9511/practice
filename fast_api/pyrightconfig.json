@@ -1,13 +1,14 @@
 {
-    "pythonVersion": "3.7",
-    "venvPath": "/usr/local/Caskroom/miniconda/base/envs",
+    "pythonVersion": "3.8",
+    "venvPath": "/Users/chibadaimare/Documents/practice/fast_api/.venv",
     "venv":"work",
     "executionEnvironments": [
         {
           "root": "/Users/chibadaimare/work/fast_api",
           "extraPaths": [
             "/Users/chibadaimare/work/fast_api/todo",
-            "/Users/chibadaimare/work/fast_api/practice"
+            "/Users/chibadaimare/work/fast_api/practice",
+            "/Users/chibadaimare/work/fast_api/tutorial"
           ]
         }
       ]
